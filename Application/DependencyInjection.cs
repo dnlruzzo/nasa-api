@@ -12,7 +12,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        services.Configure<NasaSettings>(configuration.GetSection(NasaSettings.SectionName));
+        services.AddOptions<NasaSettings>()
+                .BindConfiguration(NasaSettings.SectionName)
+                .Validate(settings => string.IsNullOrWhiteSpace(settings.ApiKey) is false, $"'{nameof(NasaSettings)}.{nameof(NasaSettings.ApiKey)}' is required.")
+                .ValidateOnStart();
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
